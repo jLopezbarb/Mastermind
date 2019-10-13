@@ -1,45 +1,32 @@
 package mastermind;
 
-import java.util.Scanner;
+import mastermind.controllers.AcceptorController;
+import mastermind.controllers.Logic;
+import mastermind.views.View;
+import mastermind.views.console.ConsoleView;
 
-public class Mastermind {
+public abstract class Mastermind {
 
-    public static final int COMBINATION_LENGTH = 4;
-    public static final int  MAX_ATTEMPS = 10;
-    private CodeMaker codeMaker;
-    private CodeBreaker codeBreaker;
+	private Logic logic;
+	private View view;
+
+	protected Mastermind() {
+		this.logic = this.createLogic();
+		this.view = new ConsoleView();
+	}
 
 
-    public void play(){
-        Scanner scanner = new Scanner(System.in);
-        String option;
-        do {
-            System.out.println("----- MASTERMIND -----");
-            startNewGame();
-            System.out.print("Do you want to continue? [Y/n]: ");
-            option = scanner.nextLine();
-        }while(wantsToContinue(option));
-    }
+	protected void play() {
+		AcceptorController acceptorController;
+		do {
+			acceptorController = this.logic.getController();
+			if (acceptorController != null) {
+                this.view.interact(acceptorController);
+            }
+		} while (acceptorController != null);
+	}
 
-    private void startNewGame(){
-        this.codeBreaker = new CodeBreaker();
-        this.codeMaker = new CodeMaker(this.codeBreaker);
-        this.codeMaker.printCombination();
-        do {
-            this.codeBreaker.guess();
-            this.codeMaker.answer();
-            this.printGameStatus();
-        }while (!(this.codeBreaker.isWinner() || this.codeBreaker.isLooser()));
-    }
-
-    private boolean wantsToContinue(String option){
-        return (!option.toLowerCase().equals("n"));
-    }
-
-    private void printGameStatus(){
-        this.codeBreaker.printAttemps();
-        this.codeMaker.printCombination();
-        this.codeBreaker.printCombinations();
-    }
-
+	protected abstract Logic createLogic();
+	
 }
+
