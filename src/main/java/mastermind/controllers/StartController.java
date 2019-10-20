@@ -1,21 +1,21 @@
 package mastermind.controllers;
 
-import mastermind.models.Game;
-import mastermind.models.State;
+import mastermind.models.Session;
+import mastermind.views.console.SecretCombinationView;
+import mastermind.views.console.StartView;
 
 public class StartController extends Controller {
 
-    StartController(Game game, State state) {
-        super(game, state);
-    }
-
-    public void start() {
-        this.state.next();
+    StartController(Session session) {
+        super(session);
     }
 
     @Override
-    public void accept(ControllerVisitor controllerVisitor) {
-        controllerVisitor.visit(this);
+    public void control() {
+        new StartView().writeln();
+        new SecretCombinationView().writeln(this.session.getWidth());
+        this.session.next();
     }
+
 
 }

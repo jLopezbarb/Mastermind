@@ -1,38 +1,23 @@
 package mastermind.views.console;
 
-import mastermind.controllers.ProposeController;
-import mastermind.models.Error;
+import mastermind.models.Color;
 import mastermind.utils.IO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProposedCombinationView  {
 
-    protected final ProposeController controller;
-
-    ProposedCombinationView(ProposeController controller){
-        this.controller = controller;
-    }
-
-    void writeAttemps() {
-        IO.writeln(Message.ATTEMPTS.replaceAll("#attempts", "" + this.controller.getAttemps()));
-    }
-
-    void writeGameInfo() {
-        for (int i = 0; i < this.controller.getAttemps(); i++) {
-            IO.write(this.controller.getProposedCombinations().get(i).toString());
-            IO.writeln(this.controller.getResults().get(i).toString());
+    public List<Color> propose() {
+        String proposedColors = IO.readString(Message.PROPOSED_COMBINATION);
+        List<Color> colors = new ArrayList<>();
+        for (int i = 0; i < proposedColors.length(); i++) {
+            colors.add(Color.getInstance(proposedColors.charAt(i)));
         }
+        return colors;
     }
 
-    void propose() {
-        Error error;
-        String characters;
-        do {
-            characters = IO.readString(Message.PROPOSED_COMBINATION);
-            error = this.controller.isCorrectCombination(characters);
-            if (error != null){
-                IO.writeln(error.toString());
-            }
-        } while (error != null);
-        this.controller.addCombination(characters);
+    public void writeln(String message){
+        IO.writeln(message);
     }
 }

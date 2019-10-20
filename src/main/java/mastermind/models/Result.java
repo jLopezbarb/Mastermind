@@ -14,7 +14,7 @@ public class Result {
         this.whites = whites;
     }
 
-    public boolean isWinner() {
+    boolean isWinner() {
         return this.blacks == Combination.getWidth();
     }
 
@@ -23,4 +23,11 @@ public class Result {
                 .replaceFirst("#whites", "" + whites);
     }
 
+    public int getBlacks() {
+        return this.blacks;
+    }
+
+    public int getWhites() {
+        return this.whites;
+    }
 }

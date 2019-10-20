@@ -3,16 +3,13 @@ package mastermind;
 import mastermind.controllers.Controller;
 import mastermind.controllers.Logic;
 import mastermind.views.View;
-import mastermind.views.console.ConsoleView;
 
 public class Mastermind {
 
     private Logic logic;
-    private View view;
 
     private Mastermind() {
         this.logic = new Logic();
-        this.view = new ConsoleView();
     }
 
     private void play() {
@@ -20,7 +17,7 @@ public class Mastermind {
         do {
             controller = this.logic.getController();
             if (controller != null) {
-                this.view.interact(controller);
+                controller.control();
             }
         } while (controller != null);
     }

@@ -1,45 +1,19 @@
 package mastermind.views.console;
 
-import mastermind.controllers.ProposeController;
-import mastermind.utils.IO;
+import mastermind.models.Session;
 
-class GameView {
+public class GameView {
 
-    private final ProposeController controller;
-
-    GameView(ProposeController controller) {
-        this.controller = controller;
-    }
-
-    void writeln() {
-        IO.writeln();
-        IO.writeln(Message.GAME_TITLE);
-        SecretCombinationView secretView = new SecretCombinationView(this.controller);
-        secretView.writeln();
-        boolean isWinner, isLooser;
-        do {
-            ProposedCombinationView proposedView = new ProposedCombinationView(this.controller);
-            proposedView.propose();
-            proposedView.writeAttemps();
-            secretView.writeln();
-            proposedView.writeGameInfo();
-            isWinner = this.controller.isWinner();
-            isLooser = this.controller.isLooser();
-            writeIfLooser(isLooser);
-            writeIfWinner(isWinner);
-        } while (!isWinner & !isLooser);
-
-    }
-
-    private void writeIfLooser(boolean isLooser){
-        if (isLooser) {
-            IO.writeln(Message.LOOSER);
+    public void writeln(Session session) {
+        new AttemptsView().writeln(session.getAttempts());
+        new SecretCombinationView().writeln(session.getWidth());
+        for (int i = 0; i < session.getAttempts(); i++) {
+            this.writeCombination(session, i);
         }
     }
 
-    private void writeIfWinner(boolean isWinner){
-        if (isWinner) {
-            IO.writeln(Message.WINNER);
-        }
+    private void writeCombination(Session session, int attempt){
+        new CombinationView().write(session.getCombination(attempt));
+        new ResultView().writeln(session.getResult(attempt));
     }
 }

@@ -2,83 +2,67 @@ package mastermind.controllers;
 
 import mastermind.models.*;
 import mastermind.models.Error;
+import mastermind.views.console.ErrorView;
+import mastermind.views.console.GameView;
+import mastermind.views.console.Message;
+import mastermind.views.console.ProposedCombinationView;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProposeController extends Controller {
 
 
-    ProposeController(Game game, State state) {
-        super(game, state);
+    ProposeController(Session session) {
+        super(session);
     }
 
     @Override
-    public void accept(ControllerVisitor controllerVisitor) {
-        controllerVisitor.visit(this);
+    public void control() {
+        Error error;
+        do{
+            List<Color> colors = new ProposedCombinationView().propose();
+            error = this.addCombination(colors);
+            if (error != null){
+                new ErrorView(error).writeln();
+            }
+        } while (error != null);
+        new GameView().writeln(this.session);
+        this.isFinished();
     }
 
-    public SecretCombination getSecretCombination(){
-        return this.game.getSecretCombination();
-    }
-
-    public mastermind.models.Error isCorrectCombination(String characters){
+    private Error addCombination(List<Color> colors) {
         Error error = null;
-        ArrayList<Color> colors = new ArrayList<>();
-        if (characters.length() != getSecretCombination().getWidth()) {
+        if (colors.size() != Combination.getWidth()) {
             error = mastermind.models.Error.WRONG_LENGTH;
         } else {
-            for (int i = 0; i < characters.length(); i++) {
-                Color color = Color.getInstance(characters.charAt(i));
+            for (int i = 0; i < colors.size(); i++) {
+                Color color = colors.get(i);
                 if (color == null) {
                     error = mastermind.models.Error.WRONG_CHARACTERS;
                 } else {
-                    for (Color value : colors) {
-                        if (color == value) {
+                    for (int j = i+1; j < colors.size(); j++) {
+                        if (colors.get(i) == colors.get(j)) {
                             error = Error.DUPLICATED;
+                            break;
                         }
                     }
-                    colors.add(color);
                 }
             }
+        }
+        if (error == null){
+            this.session.addProposedCombination(new ProposedCombination(colors));
         }
         return error;
     }
 
-    public void addCombination(String colors){
-        ArrayList<Color> combination = new ArrayList<>();
-        for (int i = 0; i < colors.length(); i++) {
-            Color color = Color.getInstance(colors.charAt(i));
-            combination.add(color);
+    private void isFinished() {
+        if (this.session.isWinner()) {
+            new ProposedCombinationView().writeln(Message.WINNER);
+            this.session.next();
+        } else if (this.session.isLooser()) {
+            new ProposedCombinationView().writeln(Message.LOOSER);
+            this.session.next();
         }
-        ProposedCombination proposedCombination = new ProposedCombination(combination);
-        this.game.addProposedCombination(proposedCombination);
     }
-
-    public int getAttemps(){
-        return this.game.getAttemps();
-    }
-
-    public List<ProposedCombination> getProposedCombinations() {
-        return this.game.getProposedCombinations();
-    }
-
-    public List<Result> getResults() {
-        return this.game.getResults();
-    }
-
-    public boolean isWinner(){
-        return this.getResults().get(this.getAttemps() - 1).isWinner();
-    }
-
-    public boolean isLooser(){
-        return this.getAttemps() == Game.MAX_LONG;
-    }
-    public void finish(){
-        this.state.next();
-    }
-
-
-
 }
